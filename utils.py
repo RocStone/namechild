@@ -101,24 +101,38 @@ def getScore(name):
     :param name:  姓名
     :return: 得分
     """
-    try:
-        surname = parse.quote(name[0:1].encode('gb2312'))
-        lastname = parse.quote(name[1:].encode('gb2312'))
-    except UnicodeEncodeError as e:
-        print(name, '出错：', str(e))
-        return
+    # try:
+    #     surname = parse.quote(name[0:1].encode('gb2312'))
+    #     lastname = parse.quote(name[1:].encode('gb2312'))
+    # except UnicodeEncodeError as e:
+    #     print(name, '出错：', str(e))
+    #     return
     s = parse.quote(SEX.encode('gb2312'))
-    detail_url = "http://www.qimingzi.net/simpleReport.aspx?surname=" + surname + "&name=" + lastname + "&sex=" + s
-    html = getHtml(detail_url)
+    # detail_url = "http://www.qimingzi.net/simpleReport.aspx?surname=" + surname + "&name=" + lastname + "&sex=" + s
+    # html = getHtml(detail_url)
+    #
+    # first_tag = '<div class="fenshu">'
+    # last_tag = '</div><a name="zhuanye">'
+    # score = html[html.index(first_tag) + len(first_tag): html.index(last_tag)]
 
-    first_tag = '<div class="fenshu">'
-    last_tag = '</div><a name="zhuanye">'
+    # 换个网站，上面那个坏了
+    # detail_url = "http://www.qimingzi.net/simpleReport.aspx?surname=" + surname + "&name=" + lastname + "&sex=" + s
+    result = requests.post('https://www.ximizi.net/mingzi_dafen.php', data={
+        'self_x': name[0],
+        'self_m': name[1:],
+        'cemingzi': '姓名测试打分'
+    })
+    html = result.text
+    first_tag = 'color:#FF0000;padding-right:15px;">'
+    last_tag = 'å\x88\x86</font></strong>'
     score = html[html.index(first_tag) + len(first_tag): html.index(last_tag)]
+    # score = score[:-1]
     print("名字：{}  分数：{}".format(name, score))
-    writeDown("{},{}".format(name, score), TESTED_FILE)
-    if score and int(score) >= THRESHOLD_SCORE:
+    writeDown("名字：{}  分数：{}".format(name, score), TESTED_FILE)
+    if score and float(score) >= THRESHOLD_SCORE:
         # 符合阈值要求的结果记录到结果文本
-        result = ','.join([name, score, detail_url])
+        # result = ','.join([name, score, detail_url])
+        result = "名字：{}  分数：{}".format(name, score)
         writeDown(result, RESULT_FILE)
     return score
 
