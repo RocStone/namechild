@@ -1,4 +1,4 @@
-Forked from GoodGoodName
+Forked from GoodGoodName to fix its bug.
 _______________________________________________________________________
 好好起名(Name)
 ========
